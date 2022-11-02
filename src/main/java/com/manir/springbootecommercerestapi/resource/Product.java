@@ -29,4 +29,9 @@ public class Product {
     private Integer quantity;
     @Column(name = "status")
     private String status;
+
+    //relation between category and product
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    Category category;
 }

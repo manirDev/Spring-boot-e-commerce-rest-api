@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,4 +27,15 @@ public class Category {
     private String description;
     @Column(name = "status")
     private String status;
+
+    //relation between parent and child categories
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Category parent;
+    @OneToMany(mappedBy = "parent")
+    private Set<Category> children = new HashSet<>();
+
+    //relation between category and product
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Product> products = new HashSet<>();
 }
