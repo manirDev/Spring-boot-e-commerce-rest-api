@@ -11,4 +11,6 @@ public class ProductDto {
     private double price;
     private Integer quantity;
     private String status;
+
+    private CategoryDto category;
 }

@@ -23,6 +23,16 @@ public class ProductController {
         return   new ResponseEntity<>(responseProduct, HttpStatus.CREATED);
     }
 
+    //create product with category
+    @PostMapping("/{categoryId}/saveProductByCategoryId")
+    public ResponseEntity<ProductDto> saveProductByCategoryId(@PathVariable Long categoryId,
+                                                              @RequestBody ProductDto productDto){
+        ProductDto responseProduct = productService.saveProductByCategoryId(categoryId, productDto);
+        return new ResponseEntity<>(responseProduct, HttpStatus.CREATED);
+    }
+
+
+
     //get all products api
     @GetMapping("/getAllProduct")
     public List<ProductDto> getAllProduct(){
@@ -38,10 +48,11 @@ public class ProductController {
     }
 
     //update product api
-    @PutMapping("/updateProduct/{productId}")
-    public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto productDto,
+    @PutMapping("/{categoryId}/updateProduct/{productId}")
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long categoryId,
+                                                    @RequestBody ProductDto productDto,
                                                     @PathVariable Long productId){
-        ProductDto responseProduct = productService.updateProduct(productDto, productId);
+        ProductDto responseProduct = productService.updateProduct(categoryId, productDto, productId);
         return ResponseEntity.ok(responseProduct);
     }
 
