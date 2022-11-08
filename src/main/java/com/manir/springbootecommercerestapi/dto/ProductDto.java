@@ -21,4 +21,6 @@ public class ProductDto {
     private CategoryDto category;
 
     private Set<ImageDataDto> images;
+
+    private Set<CommentDto> comments;
 }

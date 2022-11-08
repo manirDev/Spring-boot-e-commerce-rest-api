@@ -45,4 +45,8 @@ public class Product {
     //relation image gallery
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ImageData> images;
+
+    //relation to product comment
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> comments;
 }
