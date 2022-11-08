@@ -5,12 +5,18 @@ import com.manir.springbootecommercerestapi.exception.ResourceNotFoundException;
 import com.manir.springbootecommercerestapi.repository.CategoryRepository;
 import com.manir.springbootecommercerestapi.repository.ProductRepository;
 import com.manir.springbootecommercerestapi.resource.Category;
+import com.manir.springbootecommercerestapi.resource.ImageData;
 import com.manir.springbootecommercerestapi.resource.Product;
 import com.manir.springbootecommercerestapi.service.ProductService;
+import com.manir.springbootecommercerestapi.utils.ImageUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,8 +31,9 @@ public class ProductServiceImpl implements ProductService {
     private CategoryRepository categoryRepository;
 
     @Override
-    public ProductDto createProduct(ProductDto productDto) {
+    public ProductDto createProduct(ProductDto productDto, MultipartFile file) {
         //map to entity
+        productDto.setImage(uploadProductImage(file));
         Product product = mapToEntity(productDto);
         Product createdProduct = productRepository.save(product);
         //map to dto
@@ -104,6 +111,22 @@ public class ProductServiceImpl implements ProductService {
 
         return responseProduct;
     }
+
+    //upload image
+    private String uploadProductImage(MultipartFile file){
+        ProductDto productDto = new ProductDto();
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        if(fileName.contains("..")){
+            System.out.println("Not a valid file");
+        }
+        try {
+            productDto.setImage(Base64.getEncoder().encodeToString(file.getBytes()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return productDto.getImage();
+    }
+
 
     //map to dto
     private ProductDto mapToDto(Product product){

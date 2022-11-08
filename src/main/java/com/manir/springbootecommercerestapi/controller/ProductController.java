@@ -4,9 +4,12 @@ import com.manir.springbootecommercerestapi.dto.ProductDto;
 import com.manir.springbootecommercerestapi.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -17,9 +20,10 @@ public class ProductController {
     private ProductService productService;
 
     //product create api
-    @PostMapping("/createProduct")
-    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto){
-        ProductDto responseProduct = productService.createProduct(productDto);
+    @RequestMapping(value = "/createProduct", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ProductDto> createProduct(@RequestPart("productDto") ProductDto productDto,
+                                                    @RequestPart("file") MultipartFile file){
+        ProductDto responseProduct = productService.createProduct(productDto, file);
         return   new ResponseEntity<>(responseProduct, HttpStatus.CREATED);
     }
 

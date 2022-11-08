@@ -1,11 +1,12 @@
 package com.manir.springbootecommercerestapi.service;
 
 import com.manir.springbootecommercerestapi.dto.ProductDto;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface ProductService {
-    ProductDto createProduct(ProductDto productDto);
+    ProductDto createProduct(ProductDto productDto, MultipartFile file);
     List<ProductDto> getAllProduct();
     ProductDto getProductById(Long productId);
     ProductDto updateProduct(Long categoryId, ProductDto productDto, Long productId);

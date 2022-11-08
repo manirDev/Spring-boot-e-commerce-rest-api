@@ -1,5 +1,9 @@
 package com.manir.springbootecommercerestapi.dto;
+import com.manir.springbootecommercerestapi.resource.ImageData;
 import lombok.Data;
+
+import java.util.List;
+import java.util.Set;
 
 @Data
 public class ProductDto {
@@ -12,5 +16,9 @@ public class ProductDto {
     private Integer quantity;
     private String status;
 
+    private String image;
+
     private CategoryDto category;
+
+    private Set<ImageDataDto> images;
 }

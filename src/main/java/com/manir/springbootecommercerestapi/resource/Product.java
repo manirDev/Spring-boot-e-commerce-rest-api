@@ -3,6 +3,8 @@ package com.manir.springbootecommercerestapi.resource;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,8 +31,18 @@ public class Product {
     @Column(name = "status")
     private String status;
 
+    //product image
+    @Lob
+    @Column(name = "image")
+    private String image;
+
+
     //relation between category and product
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    Category category;
+    private Category category;
+
+    //relation image gallery
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ImageData> images;
 }
