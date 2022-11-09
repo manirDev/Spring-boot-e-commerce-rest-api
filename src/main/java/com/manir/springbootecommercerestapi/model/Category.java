@@ -13,6 +13,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "categories")
+@JsonIgnoreProperties(value = {"children"})
 public class Category {
 
     @Id
@@ -28,15 +29,15 @@ public class Category {
     private String status;
 
     //relation between parent and child categories
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Category parent;
-    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JsonIgnore
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Category> children = new HashSet<>();
 
-
     //relation between category and product
+    @JsonIgnore
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Product> products = new HashSet<>();
 }

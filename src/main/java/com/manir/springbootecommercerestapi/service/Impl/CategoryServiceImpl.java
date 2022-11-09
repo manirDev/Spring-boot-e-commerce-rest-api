@@ -5,11 +5,13 @@ import com.manir.springbootecommercerestapi.exception.ResourceNotFoundException;
 import com.manir.springbootecommercerestapi.repository.CategoryRepository;
 import com.manir.springbootecommercerestapi.model.Category;
 import com.manir.springbootecommercerestapi.service.CategoryService;
+import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,5 +94,30 @@ public class CategoryServiceImpl implements CategoryService {
     private Category mapToEntity(CategoryDto categoryDto){
         Category category = modelMapper.map(categoryDto, Category.class);
         return  category;
+    }
+
+    private static void listCategories(Session session) {
+        Category electronics = session.get(Category.class, 1);
+
+        Set<Category> children = electronics.getChildren();
+
+        System.out.println(electronics.getTitle());
+
+        for (Category child : children) {
+            System.out.println("--" + child.getTitle());
+            printChildren(child, 1);
+        }
+    }
+
+    private static void printChildren(Category parent, int subLevel) {
+        Set<Category> children = parent.getChildren();
+
+        for (Category child : children) {
+            for (int i = 0; i <= subLevel; i++) System.out.print("--");
+
+            System.out.println(child.getTitle());
+
+            printChildren(child, subLevel + 1);
+        }
     }
 }

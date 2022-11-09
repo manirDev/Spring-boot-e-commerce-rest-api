@@ -37,7 +37,7 @@ public class Product {
 
 
     //relation between category and product
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "category_id")
     private Category category;
 
