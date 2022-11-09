@@ -7,6 +7,10 @@ import com.manir.springbootecommercerestapi.model.Category;
 import com.manir.springbootecommercerestapi.service.CategoryService;
 import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,11 +39,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDto> getAllCategory() {
+    public List<CategoryDto> getAllCategory(int pageNo, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Page<Category> categories = categoryRepository.findAll(pageable);
 
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categoryList = categories.getContent();
         //map all categories to dto
-        List<CategoryDto> categoryDtoList = categories.stream()
+        List<CategoryDto> categoryDtoList = categoryList.stream()
                                                       .map(category -> mapToDto(category))
                                                       .collect(Collectors.toList());
 

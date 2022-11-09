@@ -2,6 +2,7 @@ package com.manir.springbootecommercerestapi.controller;
 
 import com.manir.springbootecommercerestapi.dto.ProductDto;
 import com.manir.springbootecommercerestapi.service.ProductService;
+import com.manir.springbootecommercerestapi.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -39,8 +39,11 @@ public class ProductController {
 
     //get all products api
     @GetMapping("/getAllProduct")
-    public List<ProductDto> getAllProduct(){
-        List<ProductDto> responseProductDtoList = productService.getAllProduct();
+    public List<ProductDto> getAllProduct(@RequestParam(value = "pageNo", defaultValue = Constant.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+                                          @RequestParam(value = "pageSize", defaultValue = Constant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+                                          @RequestParam(value = "sortBy", defaultValue = Constant.DEFAULT_SORT_BY, required = false) String sortBy,
+                                          @RequestParam(value = "sortDir", defaultValue = Constant.DEFAULT_SORT_DIRECTION, required = false) String sortDir){
+        List<ProductDto> responseProductDtoList = productService.getAllProduct(pageNo, pageSize, sortBy, sortDir);
         return responseProductDtoList;
     }
 
