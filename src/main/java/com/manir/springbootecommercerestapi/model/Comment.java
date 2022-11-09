@@ -1,4 +1,4 @@
-package com.manir.springbootecommercerestapi.resource;
+package com.manir.springbootecommercerestapi.model;
 
 import lombok.*;
 

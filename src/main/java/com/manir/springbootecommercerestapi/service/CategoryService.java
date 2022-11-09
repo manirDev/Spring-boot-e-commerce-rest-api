@@ -12,5 +12,6 @@ public interface CategoryService {
     CategoryDto updateCategory(CategoryDto categoryDto, Long categoryId);
     void deleteCategory(Long categoryId);
 
+    //List<CategoryDto> findChildren(Long parentId);
 
 }

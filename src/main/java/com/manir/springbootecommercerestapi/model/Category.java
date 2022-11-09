@@ -1,10 +1,10 @@
-package com.manir.springbootecommercerestapi.resource;
+package com.manir.springbootecommercerestapi.model;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -28,11 +28,13 @@ public class Category {
     private String status;
 
     //relation between parent and child categories
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_id")
     private Category parent;
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<Category> children = new HashSet<>();
+
 
     //relation between category and product
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)

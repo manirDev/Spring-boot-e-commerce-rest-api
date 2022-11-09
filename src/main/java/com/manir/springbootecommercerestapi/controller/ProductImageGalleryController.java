@@ -1,6 +1,5 @@
 package com.manir.springbootecommercerestapi.controller;
 
-import com.manir.springbootecommercerestapi.resource.ImageData;
 import com.manir.springbootecommercerestapi.service.ProductImageGalleryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

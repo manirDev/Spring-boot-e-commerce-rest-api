@@ -3,7 +3,7 @@ package com.manir.springbootecommercerestapi.service.Impl;
 import com.manir.springbootecommercerestapi.dto.CategoryDto;
 import com.manir.springbootecommercerestapi.exception.ResourceNotFoundException;
 import com.manir.springbootecommercerestapi.repository.CategoryRepository;
-import com.manir.springbootecommercerestapi.resource.Category;
+import com.manir.springbootecommercerestapi.model.Category;
 import com.manir.springbootecommercerestapi.service.CategoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;

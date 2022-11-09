@@ -1,9 +1,8 @@
-package com.manir.springbootecommercerestapi.resource;
+package com.manir.springbootecommercerestapi.model;
 
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
