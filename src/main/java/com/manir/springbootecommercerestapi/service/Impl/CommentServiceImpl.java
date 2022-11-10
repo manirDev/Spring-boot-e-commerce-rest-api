@@ -1,6 +1,7 @@
 package com.manir.springbootecommercerestapi.service.Impl;
 
 import com.manir.springbootecommercerestapi.dto.CommentDto;
+import com.manir.springbootecommercerestapi.exception.EcommerceApiException;
 import com.manir.springbootecommercerestapi.exception.ResourceNotFoundException;
 import com.manir.springbootecommercerestapi.repository.CommentRepository;
 import com.manir.springbootecommercerestapi.repository.ProductRepository;
@@ -8,6 +9,7 @@ import com.manir.springbootecommercerestapi.model.Comment;
 import com.manir.springbootecommercerestapi.model.Product;
 import com.manir.springbootecommercerestapi.service.CommentService;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,8 +29,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto createComment(Long productId, CommentDto commentDto) {
 
-        Product product = productRepository.findById(productId).orElseThrow(()->new ResourceNotFoundException("Product", productId));
-
+        Product product = findProductById(productId);
         //convert to entity
         Comment comment = mapToEntity(commentDto);
         //save to db
@@ -43,43 +44,45 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentDto> getAllComments() {
         List<Comment> comments = commentRepository.findAll();
-        List<CommentDto> commentDtoList = comments.stream().map(comment -> mapToDto(comment)).collect(Collectors.toList());
+        List<CommentDto> commentDtoList = comments.stream()
+                                                  .map(comment -> mapToDto(comment))
+                                                  .collect(Collectors.toList());
         return commentDtoList;
     }
 
     @Override
     public List<CommentDto> getAllCommentsByProductId(Long productId) {
         List<Comment> comments = commentRepository.findByProductId(productId);
-        List<CommentDto> commentDtoList = comments.stream().map(comment -> mapToDto(comment)).collect(Collectors.toList());
+        List<CommentDto> commentDtoList = comments.stream()
+                                                  .map(comment -> mapToDto(comment))
+                                                  .collect(Collectors.toList());
         return commentDtoList;
     }
 
     @Override
     public CommentDto getCommentById(Long productId, Long commentId) {
-        Product product = productRepository.findById(productId).orElseThrow(()->new ResourceNotFoundException("Product", productId));
-        Comment comment = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment", commentId));
-        CommentDto responseComment = null;
-        if (comment.getProduct().getId() == product.getId()){
-            responseComment = mapToDto(comment);
+
+        Product product = findProductById(productId);
+        Comment comment = findCommentById(commentId);
+
+        if (!comment.getProduct().getId().equals(product.getId())){
+            throw new EcommerceApiException("Comment does not belong to product", HttpStatus.BAD_REQUEST);
         }
 
-        return responseComment;
+        return mapToDto(comment);
     }
 
     @Override
     public CommentDto updateComment(Long productId, CommentDto commentDto, Long commentId) {
-        Product product = productRepository.findById(productId).orElseThrow(()->new ResourceNotFoundException("Product", productId));
-        Comment comment = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment", commentId));
+        Product product = findProductById(productId);
+        Comment comment = findCommentById(commentId);
 
-
-
-        if (comment.getProduct().getId() == product.getId()){
-            comment.setReview(commentDto.getReview());
-            comment.setRate(commentDto.getRate());
-            comment.setStatus(commentDto.getStatus());
-
+        if (!comment.getProduct().getId().equals(product.getId())){
+            throw new EcommerceApiException("Comment does not belong to product", HttpStatus.BAD_REQUEST);
         }
-
+        comment.setReview(commentDto.getReview());
+        comment.setRate(commentDto.getRate());
+        comment.setStatus(commentDto.getStatus());
         Comment updatedComment = commentRepository.save(comment);
 
         return mapToDto(updatedComment);
@@ -87,11 +90,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void deleteComment(Long productId, Long commentId) {
-        Product product = productRepository.findById(productId).orElseThrow(()->new ResourceNotFoundException("Product", productId));
-        Comment comment = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment", commentId));
-        if (comment.getProduct().getId() == product.getId()){
-            commentRepository.delete(comment);
+        Product product = findProductById(productId);
+        Comment comment = findCommentById(commentId);
+        if (!comment.getProduct().getId().equals(product.getId())){
+            throw new EcommerceApiException("Comment does not belong to product", HttpStatus.BAD_REQUEST);
         }
+        commentRepository.delete(comment);
     }
 
     //map to dto
@@ -105,4 +109,15 @@ public class CommentServiceImpl implements CommentService {
         Comment comment  = modelMapper.map(commentDto, Comment.class);
         return comment;
     }
+
+    private Product findProductById(Long productId){
+        Product product = productRepository.findById(productId).orElseThrow(()->new ResourceNotFoundException("Product", productId));
+        return product;
+    }
+
+    private Comment findCommentById(Long commentId){
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()->new ResourceNotFoundException("Comment", commentId));
+        return comment;
+    }
+
 }
