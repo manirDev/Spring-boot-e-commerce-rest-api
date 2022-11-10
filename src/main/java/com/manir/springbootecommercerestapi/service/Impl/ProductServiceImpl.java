@@ -6,8 +6,13 @@ import com.manir.springbootecommercerestapi.repository.CategoryRepository;
 import com.manir.springbootecommercerestapi.repository.ProductRepository;
 import com.manir.springbootecommercerestapi.model.Category;
 import com.manir.springbootecommercerestapi.model.Product;
+import com.manir.springbootecommercerestapi.response.ProductResponse;
 import com.manir.springbootecommercerestapi.service.ProductService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,15 +45,28 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDto> getAllProduct() {
+    public ProductResponse getAllProduct(int pageNo, int pageSize, String sortBy, String sortDir) {
 
-        List<Product> products = productRepository.findAll();
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Page<Product> products = productRepository.findAll(pageable);
+
+        List<Product> productList = products.getContent();
         //map to dtos
-        List<ProductDto> productDtoList = products.stream()
+        List<ProductDto> productDtoList = productList.stream()
                                                   .map(product -> mapToDto(product))
                                                   .collect(Collectors.toList());
 
-        return productDtoList;
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setContent(productDtoList);
+        productResponse.setPageNo(products.getNumber());
+        productResponse.setPageSize(products.getSize());
+        productResponse.setTotalPages(products.getTotalPages());
+        productResponse.setTotalElements(products.getTotalElements());
+        productResponse.setLast(products.isLast());
+
+        return productResponse;
     }
 
     @Override
