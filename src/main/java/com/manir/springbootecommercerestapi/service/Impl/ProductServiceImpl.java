@@ -6,9 +6,13 @@ import com.manir.springbootecommercerestapi.repository.CategoryRepository;
 import com.manir.springbootecommercerestapi.repository.ProductRepository;
 import com.manir.springbootecommercerestapi.model.Category;
 import com.manir.springbootecommercerestapi.model.Product;
-import com.manir.springbootecommercerestapi.response.ProductResponse;
+import com.manir.springbootecommercerestapi.response.CommonResponse;
+import com.manir.springbootecommercerestapi.service.CommonService;
 import com.manir.springbootecommercerestapi.service.ProductService;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +28,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ProductServiceImpl implements ProductService {
+
+    private static Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Resource(name = "modelMapper")
     private ModelMapper modelMapper;
@@ -32,6 +39,9 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
     @Resource(name = "categoryRepository")
     private CategoryRepository categoryRepository;
+
+    @Resource
+    private CommonService commonService;
 
     @Override
     public ProductDto createProduct(ProductDto productDto, MultipartFile file) {
@@ -45,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getAllProduct(int pageNo, int pageSize, String sortBy, String sortDir) {
+    public CommonResponse getAllProduct(int pageNo, int pageSize, String sortBy, String sortDir) {
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
@@ -58,14 +68,7 @@ public class ProductServiceImpl implements ProductService {
                                                   .map(product -> mapToDto(product))
                                                   .collect(Collectors.toList());
 
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setContent(productDtoList);
-        productResponse.setPageNo(products.getNumber());
-        productResponse.setPageSize(products.getSize());
-        productResponse.setTotalPages(products.getTotalPages());
-        productResponse.setTotalElements(products.getTotalElements());
-        productResponse.setLast(products.isLast());
-
+        CommonResponse productResponse = commonService.getResponseContent(products, productDtoList);
         return productResponse;
     }
 
@@ -133,7 +136,7 @@ public class ProductServiceImpl implements ProductService {
         ProductDto productDto = new ProductDto();
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         if(fileName.contains("..")){
-            System.out.println("Not a valid file");
+            logger.error("It is a valid file");
         }
         try {
             productDto.setImage(Base64.getEncoder().encodeToString(file.getBytes()));

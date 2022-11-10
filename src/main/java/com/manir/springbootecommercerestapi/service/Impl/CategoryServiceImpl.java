@@ -4,10 +4,12 @@ import com.manir.springbootecommercerestapi.dto.CategoryDto;
 import com.manir.springbootecommercerestapi.exception.ResourceNotFoundException;
 import com.manir.springbootecommercerestapi.repository.CategoryRepository;
 import com.manir.springbootecommercerestapi.model.Category;
-import com.manir.springbootecommercerestapi.response.CategoryResponse;
+import com.manir.springbootecommercerestapi.response.CommonResponse;
 import com.manir.springbootecommercerestapi.service.CategoryService;
-import org.hibernate.Session;
+import com.manir.springbootecommercerestapi.service.CommonService;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,16 +18,20 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
+    private static Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
+
     @Resource(name = "categoryRepository")
     private CategoryRepository categoryRepository;
     @Resource(name = "modelMapper")
     private ModelMapper modelMapper;
+
+    @Resource
+    private CommonService commonService;
 
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto) {
@@ -40,7 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponse getAllCategory(int pageNo, int pageSize, String sortBy, String sortDir) {
+    public CommonResponse getAllCategory(int pageNo, int pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<Category> categories = categoryRepository.findAll(pageable);
@@ -51,14 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
                                                       .map(category -> mapToDto(category))
                                                       .collect(Collectors.toList());
 
-        CategoryResponse categoryResponse = new CategoryResponse();
-        categoryResponse.setContent(categoryDtoList);
-        categoryResponse.setPageNo(categories.getNumber());
-        categoryResponse.setPageSize(categories.getSize());
-        categoryResponse.setTotalPages(categories.getTotalPages());
-        categoryResponse.setTotalElements(categories.getTotalElements());
-        categoryResponse.setLast(categories.isLast());
-
+        CommonResponse categoryResponse = commonService.getResponseContent(categories, categoryDtoList);
         return categoryResponse;
     }
 
