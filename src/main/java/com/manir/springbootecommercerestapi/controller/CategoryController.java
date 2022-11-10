@@ -1,6 +1,7 @@
 package com.manir.springbootecommercerestapi.controller;
 
 import com.manir.springbootecommercerestapi.dto.CategoryDto;
+import com.manir.springbootecommercerestapi.response.CategoryResponse;
 import com.manir.springbootecommercerestapi.service.CategoryService;
 import com.manir.springbootecommercerestapi.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,12 @@ public class CategoryController {
 
     //get all categories api
     @GetMapping("/getAllCategory")
-    public List<CategoryDto> getAllCategory(@RequestParam(value = "pageNo", defaultValue = Constant.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
-                                            @RequestParam(value = "pageSize", defaultValue = Constant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
-                                            @RequestParam(value = "sortBy", defaultValue = Constant.DEFAULT_SORT_BY, required = false) String sortBy,
-                                            @RequestParam(value = "sortDir", defaultValue = Constant.DEFAULT_SORT_DIRECTION, required = false) String sortDir){
-        List<CategoryDto> categoryDtoList = categoryService.getAllCategory(pageNo, pageSize, sortBy, sortDir);
-        return categoryDtoList;
+    public CategoryResponse getAllCategory(@RequestParam(value = "pageNo", defaultValue = Constant.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+                                           @RequestParam(value = "pageSize", defaultValue = Constant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+                                           @RequestParam(value = "sortBy", defaultValue = Constant.DEFAULT_SORT_BY, required = false) String sortBy,
+                                           @RequestParam(value = "sortDir", defaultValue = Constant.DEFAULT_SORT_DIRECTION, required = false) String sortDir){
+        CategoryResponse categoryResponse = categoryService.getAllCategory(pageNo, pageSize, sortBy, sortDir);
+        return categoryResponse;
     }
 
     //get category by id api

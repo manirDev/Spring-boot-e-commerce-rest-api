@@ -6,6 +6,7 @@ import com.manir.springbootecommercerestapi.repository.CategoryRepository;
 import com.manir.springbootecommercerestapi.repository.ProductRepository;
 import com.manir.springbootecommercerestapi.model.Category;
 import com.manir.springbootecommercerestapi.model.Product;
+import com.manir.springbootecommercerestapi.response.ProductResponse;
 import com.manir.springbootecommercerestapi.service.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -44,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDto> getAllProduct(int pageNo, int pageSize, String sortBy, String sortDir) {
+    public ProductResponse getAllProduct(int pageNo, int pageSize, String sortBy, String sortDir) {
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
@@ -57,7 +58,15 @@ public class ProductServiceImpl implements ProductService {
                                                   .map(product -> mapToDto(product))
                                                   .collect(Collectors.toList());
 
-        return productDtoList;
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setContent(productDtoList);
+        productResponse.setPageNo(products.getNumber());
+        productResponse.setPageSize(products.getSize());
+        productResponse.setTotalPages(products.getTotalPages());
+        productResponse.setTotalElements(products.getTotalElements());
+        productResponse.setLast(products.isLast());
+
+        return productResponse;
     }
 
     @Override

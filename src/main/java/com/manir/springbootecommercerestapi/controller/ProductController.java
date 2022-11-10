@@ -1,6 +1,7 @@
 package com.manir.springbootecommercerestapi.controller;
 
 import com.manir.springbootecommercerestapi.dto.ProductDto;
+import com.manir.springbootecommercerestapi.response.ProductResponse;
 import com.manir.springbootecommercerestapi.service.ProductService;
 import com.manir.springbootecommercerestapi.utils.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +40,11 @@ public class ProductController {
 
     //get all products api
     @GetMapping("/getAllProduct")
-    public List<ProductDto> getAllProduct(@RequestParam(value = "pageNo", defaultValue = Constant.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
-                                          @RequestParam(value = "pageSize", defaultValue = Constant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
-                                          @RequestParam(value = "sortBy", defaultValue = Constant.DEFAULT_SORT_BY, required = false) String sortBy,
-                                          @RequestParam(value = "sortDir", defaultValue = Constant.DEFAULT_SORT_DIRECTION, required = false) String sortDir){
-        List<ProductDto> responseProductDtoList = productService.getAllProduct(pageNo, pageSize, sortBy, sortDir);
+    public ProductResponse getAllProduct(@RequestParam(value = "pageNo", defaultValue = Constant.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+                                         @RequestParam(value = "pageSize", defaultValue = Constant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+                                         @RequestParam(value = "sortBy", defaultValue = Constant.DEFAULT_SORT_BY, required = false) String sortBy,
+                                         @RequestParam(value = "sortDir", defaultValue = Constant.DEFAULT_SORT_DIRECTION, required = false) String sortDir){
+       ProductResponse responseProductDtoList = productService.getAllProduct(pageNo, pageSize, sortBy, sortDir);
         return responseProductDtoList;
     }
 
