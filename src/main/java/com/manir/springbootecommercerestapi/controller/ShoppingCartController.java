@@ -33,4 +33,22 @@ public class ShoppingCartController {
 
         return new ResponseEntity<>(responseCartItem, HttpStatus.CREATED);
     }
+
+    //update item quantity api
+    @PutMapping("/updateItemQuantity/{customerId}/{productId}/{quantity}")
+    public ResponseEntity<CartItemDto> updateItemQuantity(@PathVariable Long customerId,
+                                                          @PathVariable Long productId,
+                                                          @PathVariable Integer quantity){
+
+        CartItemDto responseCartItem = shoppingCartService.updateItemQuantity(customerId, productId, quantity);
+
+        return  new ResponseEntity<>(responseCartItem, HttpStatus.OK);
+    }
+
+    //delete item product api
+    @DeleteMapping("/deleteItemProduct/{customerId}/{productId}")
+    public ResponseEntity<String> deleteItemProduct(@PathVariable Long customerId, @PathVariable Long productId){
+        shoppingCartService.deleteItemProduct(customerId, productId);
+        return ResponseEntity.ok("Product deleted successfully from cart item");
+    }
 }
