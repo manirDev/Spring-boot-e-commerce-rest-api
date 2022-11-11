@@ -1,5 +1,6 @@
 package com.manir.springbootecommercerestapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -48,4 +49,9 @@ public class Product {
     //relation to product comment
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments;
+
+
+    //relation to cart item
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CartItem> cartItems;
 }
