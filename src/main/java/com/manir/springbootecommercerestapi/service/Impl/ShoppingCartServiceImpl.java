@@ -9,6 +9,8 @@ import com.manir.springbootecommercerestapi.model.Product;
 import com.manir.springbootecommercerestapi.repository.CartItemRepository;
 import com.manir.springbootecommercerestapi.repository.CustomerRepository;
 import com.manir.springbootecommercerestapi.repository.ProductRepository;
+import com.manir.springbootecommercerestapi.response.CartItemResponse;
+import com.manir.springbootecommercerestapi.service.CommonService;
 import com.manir.springbootecommercerestapi.service.ShoppingCartService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -17,12 +19,13 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 @Service
 @Slf4j
-
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Resource
@@ -33,9 +36,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private ProductRepository productRepository;
     @Resource
     private CustomerRepository customerRepository;
-
+    @Resource
+    private CommonService commonService;
     @Override
-    public List<CartItemDto> findByCustomerId(Long customerId) {
+    public CartItemResponse findByCustomerId(Long customerId) {
 
         List<CartItem> cartItems = cartItemRepository.findByCustomerId(customerId);
 
@@ -46,21 +50,19 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         List<CartItemDto> cartItemDtoList = cartItems.stream()
                                                      .map(cartItem -> mapToDto(cartItem))
                                                      .collect(Collectors.toList());
-
-        return cartItemDtoList;
+        DoubleStream totalPrice = cartItemDtoList.stream()
+                                                 .mapToDouble(cartItemDto -> cartItemDto.getProduct().getPrice() * cartItemDto.getQuantity());
+        CartItemResponse cartItemResponse = new CartItemResponse();
+        cartItemResponse.setContent(cartItemDtoList);
+        cartItemResponse.setTotalCost(totalPrice.sum());
+        return cartItemResponse;
     }
 
     @Override
-    public CartItemDto addCartItem(Long customerId, Long productId, Integer quantity) {
+    public CartItemResponse addCartItem(Long customerId, Long productId, Integer quantity) {
         Integer addedQuantity = quantity;
-        Customer customer = customerRepository.findById(customerId)
-                                              .orElseThrow(
-                                                    () -> new ResourceNotFoundException("Customer", customerId)
-                                              );
-        Product product = productRepository.findById(productId)
-                                           .orElseThrow(
-                                                    () -> new ResourceNotFoundException("Product", productId)
-                                           );
+        Customer customer = findCustomerById(customerId);
+        Product product = findProductById(productId);
 
         CartItem cartItem = cartItemRepository.findByCustomerIdAndProductId(customerId, productId);
         if(cartItem != null){
@@ -74,49 +76,36 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
 
         CartItem addedCartItem = cartItemRepository.save(cartItem);
+        CartItemDto cartItemDto = mapToDto(addedCartItem);
 
-        return mapToDto(addedCartItem);
+        CartItemResponse cartItemResponse = commonService.getResponse(cartItemDto);
+        return cartItemResponse;
     }
 
     @Override
-    public CartItemDto updateItemQuantity(Long customerId, Long productId, Integer quantity) {
-
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Customer", customerId)
-                );
-        Product product = productRepository.findById(productId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Product", productId)
-                );
+    public CartItemResponse updateItemQuantity(Long customerId, Long productId, Integer quantity) {
 
         CartItem cartItem = cartItemRepository.findByCustomerIdAndProductId(customerId, productId);
-        if (!cartItem.getCustomer().getId().equals(customer.getId()) || !cartItem.getProduct().getId().equals(product.getId())){
-            throw new EcommerceApiException(" this cart item does not belong to Customer or Product ", HttpStatus.BAD_REQUEST);
+        if (cartItem == null){
+            throw new EcommerceApiException("Product is not in the cart item", HttpStatus.BAD_REQUEST);
         }
         cartItem.setQuantity(quantity);
         CartItem updatedItemQuantity = cartItemRepository.save(cartItem);
-        return mapToDto(updatedItemQuantity);
+        CartItemDto cartItemDto = mapToDto(updatedItemQuantity);
+
+        CartItemResponse cartItemResponse = commonService.getResponse(cartItemDto);
+        return cartItemResponse;
     }
 
     @Override
     @Transactional
     public void deleteItemProduct(Long customerId, Long productId) {
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Customer", customerId)
-                );
-        Product product = productRepository.findById(productId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Product", productId)
-                );
+
         CartItem cartItem = cartItemRepository.findByCustomerIdAndProductId(customerId, productId);
-        if (cartItem != null){
-            cartItemRepository.deleteByCustomerIdAndProductId(customerId, productId);
+        if (cartItem == null){
+            throw new EcommerceApiException("Product is not in the cart item", HttpStatus.BAD_REQUEST);
         }
-        if (!cartItem.getCustomer().getId().equals(customer.getId()) || !cartItem.getProduct().getId().equals(product.getId())){
-            throw new EcommerceApiException(" this cart item does not belong to Customer or Product ", HttpStatus.BAD_REQUEST);
-        }
+        cartItemRepository.deleteByCustomerIdAndProductId(customerId, productId);
     }
 
     //map to dto
@@ -129,5 +118,21 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private CartItem mapToEntity(CartItemDto cartItemDto){
         CartItem cartItem = modelMapper.map(cartItemDto, CartItem.class);
         return cartItem;
+    }
+
+    private Customer findCustomerById(Long customerId){
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Customer", customerId)
+                );
+        return customer;
+    }
+
+    private Product findProductById(Long productId){
+        Product product = productRepository.findById(productId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Product", productId)
+                );
+        return product;
     }
 }

@@ -1,6 +1,7 @@
 package com.manir.springbootecommercerestapi.controller;
 
 import com.manir.springbootecommercerestapi.dto.CartItemDto;
+import com.manir.springbootecommercerestapi.response.CartItemResponse;
 import com.manir.springbootecommercerestapi.service.ShoppingCartService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,29 +19,29 @@ public class ShoppingCartController {
 
     //find by customer api
     @GetMapping("/findByCustomer/{customerId}")
-    public List<CartItemDto> findByCustomerId(@PathVariable Long customerId){
-        List<CartItemDto> responseCartItems = shoppingCartService.findByCustomerId(customerId);
+    public CartItemResponse findByCustomerId(@PathVariable Long customerId){
+        CartItemResponse responseCartItems = shoppingCartService.findByCustomerId(customerId);
 
         return responseCartItems;
     }
 
     //add item to the cart api
     @PostMapping("/addItem/{customerId}/{productId}/{quantity}")
-    public ResponseEntity<CartItemDto> addCartItem(@PathVariable Long customerId,
-                                                   @PathVariable Long productId,
-                                                   @PathVariable Integer quantity){
-        CartItemDto responseCartItem = shoppingCartService.addCartItem(customerId, productId, quantity);
+    public ResponseEntity<CartItemResponse> addCartItem(@PathVariable Long customerId,
+                                                        @PathVariable Long productId,
+                                                        @PathVariable Integer quantity){
+        CartItemResponse responseCartItem = shoppingCartService.addCartItem(customerId, productId, quantity);
 
         return new ResponseEntity<>(responseCartItem, HttpStatus.CREATED);
     }
 
     //update item quantity api
     @PutMapping("/updateItemQuantity/{customerId}/{productId}/{quantity}")
-    public ResponseEntity<CartItemDto> updateItemQuantity(@PathVariable Long customerId,
-                                                          @PathVariable Long productId,
-                                                          @PathVariable Integer quantity){
+    public ResponseEntity<CartItemResponse> updateItemQuantity(@PathVariable Long customerId,
+                                                               @PathVariable Long productId,
+                                                               @PathVariable Integer quantity){
 
-        CartItemDto responseCartItem = shoppingCartService.updateItemQuantity(customerId, productId, quantity);
+        CartItemResponse responseCartItem = shoppingCartService.updateItemQuantity(customerId, productId, quantity);
 
         return  new ResponseEntity<>(responseCartItem, HttpStatus.OK);
     }
@@ -49,6 +50,6 @@ public class ShoppingCartController {
     @DeleteMapping("/deleteItemProduct/{customerId}/{productId}")
     public ResponseEntity<String> deleteItemProduct(@PathVariable Long customerId, @PathVariable Long productId){
         shoppingCartService.deleteItemProduct(customerId, productId);
-        return ResponseEntity.ok("Product deleted successfully from cart item");
+        return ResponseEntity.ok("Product with id = " + productId +" is deleted successfully from your shopping cart");
     }
 }

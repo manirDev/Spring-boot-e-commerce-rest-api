@@ -1,16 +1,14 @@
 package com.manir.springbootecommercerestapi.service;
 
-import com.manir.springbootecommercerestapi.dto.CartItemDto;
-
-import java.util.List;
+import com.manir.springbootecommercerestapi.response.CartItemResponse;
 
 public interface ShoppingCartService {
 
-    List<CartItemDto> findByCustomerId(Long customerId);
+    CartItemResponse findByCustomerId(Long customerId);
 
-    CartItemDto addCartItem(Long customerId, Long productId, Integer quantity);
+    CartItemResponse addCartItem(Long customerId, Long productId, Integer quantity);
 
-    CartItemDto updateItemQuantity(Long customerId, Long productId, Integer quantity);
+    CartItemResponse updateItemQuantity(Long customerId, Long productId, Integer quantity);
 
     void deleteItemProduct(Long customerId, Long productId);
 }
