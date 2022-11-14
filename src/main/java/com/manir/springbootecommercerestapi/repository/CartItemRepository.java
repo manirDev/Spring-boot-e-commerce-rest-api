@@ -11,7 +11,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     List<CartItem> findByCustomerId(Long customerId);
 
-    //CartItem findByCustomerAndProduct(Customer customer, Product product);
+    //CartItem findByCustomerAndProduct(User customer, Product product);
     CartItem findByCustomerIdAndProductId(Long customerId, Long productId);
 
     @Query("UPDATE CartItem c SET c.quantity = ?3 WHERE c.product.id = ?2 AND c.customer.id = ?1")

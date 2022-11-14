@@ -1,12 +1,10 @@
 package com.manir.springbootecommercerestapi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,9 +25,9 @@ public class CartItem {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    //relation with user
+    //relation with customer
     @ManyToOne()
     @JoinColumn(name = "customer_id")
-    private Customer customer;
+    private User customer;
 
 }

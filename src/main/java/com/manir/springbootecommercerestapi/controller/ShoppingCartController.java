@@ -3,8 +3,10 @@ package com.manir.springbootecommercerestapi.controller;
 import com.manir.springbootecommercerestapi.dto.CartItemDto;
 import com.manir.springbootecommercerestapi.response.CartItemResponse;
 import com.manir.springbootecommercerestapi.service.ShoppingCartService;
+import com.manir.springbootecommercerestapi.utils.isAuthenticatedAsAdminOrUser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -18,6 +20,7 @@ public class ShoppingCartController {
     private ShoppingCartService shoppingCartService;
 
     //find by customer api
+    @isAuthenticatedAsAdminOrUser
     @GetMapping("/findByCustomer/{customerId}")
     public CartItemResponse findByCustomerId(@PathVariable Long customerId){
         CartItemResponse responseCartItems = shoppingCartService.findByCustomerId(customerId);
@@ -26,6 +29,7 @@ public class ShoppingCartController {
     }
 
     //add item to the cart api
+    @isAuthenticatedAsAdminOrUser
     @PostMapping("/addItem/{customerId}/{productId}/{quantity}")
     public ResponseEntity<CartItemResponse> addCartItem(@PathVariable Long customerId,
                                                         @PathVariable Long productId,
@@ -36,6 +40,7 @@ public class ShoppingCartController {
     }
 
     //update item quantity api
+    @isAuthenticatedAsAdminOrUser
     @PutMapping("/updateItemQuantity/{customerId}/{productId}/{quantity}")
     public ResponseEntity<CartItemResponse> updateItemQuantity(@PathVariable Long customerId,
                                                                @PathVariable Long productId,
@@ -47,6 +52,7 @@ public class ShoppingCartController {
     }
 
     //delete item product api
+    @isAuthenticatedAsAdminOrUser
     @DeleteMapping("/deleteItemProduct/{customerId}/{productId}")
     public ResponseEntity<String> deleteItemProduct(@PathVariable Long customerId, @PathVariable Long productId){
         shoppingCartService.deleteItemProduct(customerId, productId);
