@@ -4,10 +4,10 @@ import com.manir.springbootecommercerestapi.dto.CartItemDto;
 import com.manir.springbootecommercerestapi.exception.EcommerceApiException;
 import com.manir.springbootecommercerestapi.exception.ResourceNotFoundException;
 import com.manir.springbootecommercerestapi.model.CartItem;
-import com.manir.springbootecommercerestapi.model.Customer;
+import com.manir.springbootecommercerestapi.model.User;
 import com.manir.springbootecommercerestapi.model.Product;
 import com.manir.springbootecommercerestapi.repository.CartItemRepository;
-import com.manir.springbootecommercerestapi.repository.CustomerRepository;
+import com.manir.springbootecommercerestapi.repository.UserRepository;
 import com.manir.springbootecommercerestapi.repository.ProductRepository;
 import com.manir.springbootecommercerestapi.response.CartItemResponse;
 import com.manir.springbootecommercerestapi.service.CommonService;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -35,7 +34,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Resource
     private ProductRepository productRepository;
     @Resource
-    private CustomerRepository customerRepository;
+    private UserRepository userRepository;
     @Resource
     private CommonService commonService;
     @Override
@@ -44,7 +43,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         List<CartItem> cartItems = cartItemRepository.findByCustomerId(customerId);
 
         if (cartItems.size() == 0){
-            throw new EcommerceApiException("Customer has no product in cart item", HttpStatus.BAD_REQUEST);
+            throw new EcommerceApiException("User has no product in cart item", HttpStatus.BAD_REQUEST);
         }
 
         List<CartItemDto> cartItemDtoList = cartItems.stream()
@@ -61,7 +60,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public CartItemResponse addCartItem(Long customerId, Long productId, Integer quantity) {
         Integer addedQuantity = quantity;
-        Customer customer = findCustomerById(customerId);
+        User user = findCustomerById(customerId);
         Product product = findProductById(productId);
 
         CartItem cartItem = cartItemRepository.findByCustomerIdAndProductId(customerId, productId);
@@ -70,7 +69,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             cartItem.setQuantity(addedQuantity);
         }else {
             cartItem = new CartItem();
-            cartItem.setCustomer(customer);
+            cartItem.setCustomer(user);
             cartItem.setProduct(product);
             cartItem.setQuantity(quantity);
         }
@@ -120,12 +119,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return cartItem;
     }
 
-    private Customer findCustomerById(Long customerId){
-        Customer customer = customerRepository.findById(customerId)
+    private User findCustomerById(Long customerId){
+        User user = userRepository.findById(customerId)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Customer", customerId)
+                        () -> new ResourceNotFoundException("User", customerId)
                 );
-        return customer;
+        return user;
     }
 
     private Product findProductById(Long productId){
