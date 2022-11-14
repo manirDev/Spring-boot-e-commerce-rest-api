@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +23,7 @@ public class ProductController {
     private ProductService productService;
 
     //product create api
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/createProduct", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<ProductDto> createProduct(@RequestPart("productDto") ProductDto productDto,
                                                     @RequestPart("file") MultipartFile file){
@@ -30,6 +32,7 @@ public class ProductController {
     }
 
     //create product with category
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{categoryId}/saveProductByCategoryId")
     public ResponseEntity<ProductDto> saveProductByCategoryId(@PathVariable Long categoryId,
                                                               @RequestBody ProductDto productDto){
@@ -57,6 +60,7 @@ public class ProductController {
     }
 
     //update product api
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{categoryId}/updateProduct/{productId}")
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long categoryId,
                                                     @RequestBody ProductDto productDto,
@@ -66,6 +70,7 @@ public class ProductController {
     }
 
     //delete product api
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/deleteProduct/{productId}")
     public  ResponseEntity<String> deleteProduct(@PathVariable Long productId){
         productService.deleteProduct(productId);
