@@ -1,11 +1,14 @@
 package com.manir.springbootecommercerestapi.model;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"userName"}),
         @UniqueConstraint(columnNames = {"email"})

@@ -4,6 +4,7 @@ import com.manir.springbootecommercerestapi.exception.EcommerceApiException;
 import com.manir.springbootecommercerestapi.model.User;
 import com.manir.springbootecommercerestapi.repository.UserRepository;
 import com.manir.springbootecommercerestapi.response.CartItemResponse;
+import com.manir.springbootecommercerestapi.service.OrderService;
 import com.manir.springbootecommercerestapi.service.ShoppingCartService;
 import com.manir.springbootecommercerestapi.utils.isAuthenticatedAsAdminOrUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,10 @@ public class ShoppingCartController {
 
     @Resource
     private ShoppingCartService shoppingCartService;
-
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private OrderService orderService;
 
     //find by customer api
     @isAuthenticatedAsAdminOrUser
@@ -96,4 +97,8 @@ public class ShoppingCartController {
             throw new EcommerceApiException("User not authenticated", HttpStatus.BAD_REQUEST);
         }
     }
+
+
+
+
 }
