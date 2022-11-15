@@ -54,4 +54,10 @@ public class Product {
     //relation to cart item
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItem> cartItems;
+
+    //relation with order_products
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, orphanRemoval = true,
+            mappedBy = "product")
+    private Set<OrderProducts> orderProducts;
 }

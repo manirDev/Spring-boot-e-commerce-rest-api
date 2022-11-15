@@ -54,7 +54,7 @@ public class AuthController {
         if (userRepository.existsByEmail(signUpDto.getEmail())){
             return new ResponseEntity<>("Email already exists", HttpStatus.BAD_REQUEST);
         }
-        SignUpDto registeredUser = userRegisterService.registerUser(signUpDto);
+        userRegisterService.registerUser(signUpDto);
         return new ResponseEntity<>("User is successfully registered", HttpStatus.OK);
     }
 

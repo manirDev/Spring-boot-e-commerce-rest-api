@@ -38,9 +38,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Resource
     private CommonService commonService;
     @Override
-    public CartItemResponse findByCustomerId(Long customerId) {
+    public CartItemResponse findByCustomer(User customer) {
 
-        List<CartItem> cartItems = cartItemRepository.findByCustomerId(customerId);
+        List<CartItem> cartItems = cartItemRepository.findByCustomer(customer);
 
         if (cartItems.size() == 0){
             throw new EcommerceApiException("User has no product in cart item", HttpStatus.BAD_REQUEST);
@@ -58,18 +58,17 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public CartItemResponse addCartItem(Long customerId, Long productId, Integer quantity) {
+    public CartItemResponse addCartItem(User customer, Long productId, Integer quantity) {
         Integer addedQuantity = quantity;
-        User user = findCustomerById(customerId);
         Product product = findProductById(productId);
 
-        CartItem cartItem = cartItemRepository.findByCustomerIdAndProductId(customerId, productId);
+        CartItem cartItem = cartItemRepository.findByCustomerAndProduct(customer, product);
         if(cartItem != null){
             addedQuantity = cartItem.getQuantity() + quantity;
             cartItem.setQuantity(addedQuantity);
         }else {
             cartItem = new CartItem();
-            cartItem.setCustomer(user);
+            cartItem.setCustomer(customer);
             cartItem.setProduct(product);
             cartItem.setQuantity(quantity);
         }
@@ -82,9 +81,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public CartItemResponse updateItemQuantity(Long customerId, Long productId, Integer quantity) {
-
-        CartItem cartItem = cartItemRepository.findByCustomerIdAndProductId(customerId, productId);
+    public CartItemResponse updateItemQuantity(User customer, Long productId, Integer quantity) {
+        Product product = findProductById(productId);
+        CartItem cartItem = cartItemRepository.findByCustomerAndProduct(customer, product);
         if (cartItem == null){
             throw new EcommerceApiException("Product is not in the cart item", HttpStatus.BAD_REQUEST);
         }
@@ -98,13 +97,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     @Transactional
-    public void deleteItemProduct(Long customerId, Long productId) {
-
-        CartItem cartItem = cartItemRepository.findByCustomerIdAndProductId(customerId, productId);
+    public void deleteItemProduct(User customer, Long productId) {
+        Product product = findProductById(productId);
+        CartItem cartItem = cartItemRepository.findByCustomerAndProduct(customer, product);
         if (cartItem == null){
             throw new EcommerceApiException("Product is not in the cart item", HttpStatus.BAD_REQUEST);
         }
-        cartItemRepository.deleteByCustomerIdAndProductId(customerId, productId);
+        cartItemRepository.deleteByCustomerAndProduct(customer.getId(), productId);
     }
 
     //map to dto

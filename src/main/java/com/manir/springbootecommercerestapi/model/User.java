@@ -31,4 +31,16 @@ public class User {
                joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles;
+
+    //relation with order
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, orphanRemoval = true,
+            mappedBy = "customer")
+    private Set<Order> orders;
+
+    //relation with order_product
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, orphanRemoval = true,
+            mappedBy = "customer")
+    private Set<OrderProducts> orderProducts;
  }
