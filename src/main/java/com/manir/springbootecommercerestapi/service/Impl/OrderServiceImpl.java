@@ -45,6 +45,7 @@ public class OrderServiceImpl implements OrderService {
         orderDto.setTotalPrice(cartItemDto.getTotalCost());
         orderDto.setEmail(customer.getEmail());
         orderDto.setName(customer.getName());
+        orderDto.setCustomer(customer);
         OrderDto savedOrder = saveOrder(orderDto, customer);
         List<CartItemDto> cartItemDtoList = cartItemDto.getContent();
         for(CartItemDto cartItem : cartItemDtoList){
@@ -54,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
             orderProducts.setOrder(mapToEntity(savedOrder));
             orderProducts.setProductPrice(cartItem.getProduct().getPrice());
             orderProducts.setProductQuantity(cartItem.getQuantity());
-            orderProducts.setTotalPrice(cartItemDto.getTotalCost());
+            orderProducts.setTotalPrice(cartItem.getProduct().getPrice()*cartItem.getQuantity());
             orderProductsService.addOrderProducts(orderProducts);
         }
         cartItemRepository.deleteByCustomerId(customer.getId());

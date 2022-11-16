@@ -1,5 +1,6 @@
 package com.manir.springbootecommercerestapi.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.manir.springbootecommercerestapi.model.User;
 import lombok.Data;
 
@@ -14,5 +15,6 @@ public class OrderDto {
     private String note;
     private  String status;
 
+    @JsonIgnore
     private User customer;
 }
