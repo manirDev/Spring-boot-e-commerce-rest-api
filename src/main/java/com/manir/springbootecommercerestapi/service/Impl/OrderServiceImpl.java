@@ -41,12 +41,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void placeOrder(User customer) {
         CartItemResponse cartItemDto = shoppingCartService.findByCustomer(customer);
-        OrderDto orderDto = new OrderDto();
-        orderDto.setTotalPrice(cartItemDto.getTotalCost());
-        orderDto.setEmail(customer.getEmail());
-        orderDto.setName(customer.getName());
-        orderDto.setCustomer(customer);
-        OrderDto savedOrder = saveOrder(orderDto, customer);
+        OrderDto orderDto = setFields(cartItemDto, customer);
+        //save order to the db
+        OrderDto savedOrder = saveOrder(orderDto);
         List<CartItemDto> cartItemDtoList = cartItemDto.getContent();
         for(CartItemDto cartItem : cartItemDtoList){
             OrderProducts orderProducts = new OrderProducts();
@@ -62,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto saveOrder(OrderDto orderDto, User customer) {
+    public OrderDto saveOrder(OrderDto orderDto) {
         //convert to entity
         Order order = mapToEntity(orderDto);
         //save order to db
@@ -70,6 +67,15 @@ public class OrderServiceImpl implements OrderService {
         return mapToDto(placedOrder);
     }
 
+    private OrderDto setFields(CartItemResponse cartItemDto, User customer){
+        OrderDto orderDto = new OrderDto();
+        orderDto.setTotalPrice(cartItemDto.getTotalCost());
+        orderDto.setEmail(customer.getEmail());
+        orderDto.setName(customer.getName());
+        orderDto.setCustomer(customer);
+
+        return orderDto;
+    }
     @Override
     public List<OrderDto> listOrdersByCustomer(User customer) {
         List<Order> orders = orderRepository.findByCustomer(customer);
