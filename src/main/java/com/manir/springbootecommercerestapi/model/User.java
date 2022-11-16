@@ -13,7 +13,7 @@ import java.util.Set;
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"userName"}),
         @UniqueConstraint(columnNames = {"email"})
 })
-public class User {
+public class User extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,4 +46,10 @@ public class User {
             fetch = FetchType.LAZY, orphanRemoval = true,
             mappedBy = "customer")
     private Set<OrderProducts> orderProducts;
+
+    //relation with comment or review
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, orphanRemoval = true,
+            mappedBy = "customer")
+    private Set<Comment> comments;
  }

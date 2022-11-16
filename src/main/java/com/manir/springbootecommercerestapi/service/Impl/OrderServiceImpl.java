@@ -41,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void placeOrder(User customer) {
         CartItemResponse cartItemDto = shoppingCartService.findByCustomer(customer);
+        //set order fields
         OrderDto orderDto = setFields(cartItemDto, customer);
         //save order to the db
         OrderDto savedOrder = saveOrder(orderDto);

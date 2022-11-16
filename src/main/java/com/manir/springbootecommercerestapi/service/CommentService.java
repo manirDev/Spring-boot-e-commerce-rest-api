@@ -2,13 +2,15 @@ package com.manir.springbootecommercerestapi.service;
 
 
 import com.manir.springbootecommercerestapi.dto.CommentDto;
+import com.manir.springbootecommercerestapi.model.User;
 
 import java.util.List;
 
 public interface CommentService {
 
-    CommentDto createComment(Long productId, CommentDto commentDto);
+    CommentDto createComment(User customer, Long productId, CommentDto commentDto);
 
+    List<CommentDto> findCommentByCustomer(User customer);
     List<CommentDto> getAllComments();
     List<CommentDto> getAllCommentsByProductId(Long productId);
     CommentDto getCommentById(Long productId, Long commentId);

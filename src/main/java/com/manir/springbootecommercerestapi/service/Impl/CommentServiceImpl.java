@@ -3,10 +3,12 @@ package com.manir.springbootecommercerestapi.service.Impl;
 import com.manir.springbootecommercerestapi.dto.CommentDto;
 import com.manir.springbootecommercerestapi.exception.EcommerceApiException;
 import com.manir.springbootecommercerestapi.exception.ResourceNotFoundException;
+import com.manir.springbootecommercerestapi.model.User;
 import com.manir.springbootecommercerestapi.repository.CommentRepository;
 import com.manir.springbootecommercerestapi.repository.ProductRepository;
 import com.manir.springbootecommercerestapi.model.Comment;
 import com.manir.springbootecommercerestapi.model.Product;
+import com.manir.springbootecommercerestapi.repository.UserRepository;
 import com.manir.springbootecommercerestapi.service.CommentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -25,20 +27,35 @@ public class CommentServiceImpl implements CommentService {
     private CommentRepository commentRepository;
     @Resource
     private ProductRepository productRepository;
+    @Resource
+    private UserRepository userRepository;
 
     @Override
-    public CommentDto createComment(Long productId, CommentDto commentDto) {
-
+    public CommentDto createComment(User customer, Long productId, CommentDto commentDto) {
+        User user = findCustomerById(customer.getId());
         Product product = findProductById(productId);
         //convert to entity
         Comment comment = mapToEntity(commentDto);
         //save to db
         comment.setProduct(product);
+        comment.setCustomer(user);
         Comment createdComment = commentRepository.save(comment);
         //convert to dto
         CommentDto responseComment = mapToDto(createdComment);
 
         return responseComment;
+    }
+
+    @Override
+    public List<CommentDto> findCommentByCustomer(User customer) {
+        List<Comment> comments = commentRepository.findByCustomer(customer);
+        if (comments.size() == 0){
+            throw new EcommerceApiException("User has no comment or review", HttpStatus.BAD_REQUEST);
+        }
+        List<CommentDto> commentDtoList = comments.stream()
+                                                            .map(comment -> mapToDto(comment))
+                                                            .collect(Collectors.toList());
+        return commentDtoList;
     }
 
     @Override
@@ -120,4 +137,8 @@ public class CommentServiceImpl implements CommentService {
         return comment;
     }
 
+    private User findCustomerById(Long customerId){
+        User customer = userRepository.findById(customerId).orElseThrow(()->new ResourceNotFoundException("Customer", customerId));
+        return customer;
+    }
 }

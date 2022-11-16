@@ -1,9 +1,15 @@
 package com.manir.springbootecommercerestapi.controller;
 
 import com.manir.springbootecommercerestapi.dto.CommentDto;
+import com.manir.springbootecommercerestapi.model.User;
 import com.manir.springbootecommercerestapi.service.CommentService;
+import com.manir.springbootecommercerestapi.service.CommonService;
+import com.manir.springbootecommercerestapi.utils.isAuthenticatedAsAdminOrUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -13,15 +19,28 @@ import java.util.List;
 @RequestMapping(value = "api/v1/products")
 public class CommentController {
 
-    @Resource
+    @Autowired
     private CommentService commentService;
+    @Autowired
+    private CommonService commonService;
 
     //create comment api
+    @isAuthenticatedAsAdminOrUser
     @PostMapping("/{productId}/createComment")
-    public ResponseEntity<CommentDto> createComment(@PathVariable Long productId,
+    public ResponseEntity<CommentDto> createComment(@AuthenticationPrincipal Authentication authentication,
+                                                    @PathVariable Long productId,
                                                     @RequestBody CommentDto commentDto){
-        CommentDto responseComment = commentService.createComment(productId, commentDto);
+        User customer = commonService.getCurrentAuthenticatedUser(authentication);
+        CommentDto responseComment = commentService.createComment(customer, productId, commentDto);
         return new ResponseEntity<>(responseComment, HttpStatus.CREATED);
+    }
+
+    //get comment by user
+    @isAuthenticatedAsAdminOrUser
+    @GetMapping("/comment/findByUser")
+    public List<CommentDto> findByUser(@AuthenticationPrincipal Authentication authentication){
+        User customer = commonService.getCurrentAuthenticatedUser(authentication);
+        return commentService.findCommentByCustomer(customer);
     }
 
     //get all comments api
@@ -58,4 +77,6 @@ public class CommentController {
         commentService.deleteComment(productId, commentId);
         return ResponseEntity.ok("Comment with id: "+commentId+" is successfully:)");
     }
+
+
 }
