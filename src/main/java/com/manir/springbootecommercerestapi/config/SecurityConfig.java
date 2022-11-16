@@ -1,6 +1,8 @@
 package com.manir.springbootecommercerestapi.config;
 
 import com.manir.springbootecommercerestapi.security.CustomUserDetailsService;
+import com.manir.springbootecommercerestapi.security.JwtAuthenticationEntryPoint;
+import com.manir.springbootecommercerestapi.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +13,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -25,21 +29,43 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+    @Autowired
+    private JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                /*-------------------------JWT Starts------------------------------*/
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                /*-------------------------JWT ends------------------------------*/
+                .and()
                 .authorizeRequests()
                 //to permit all get request and secure post put and delete methods
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                 //authorize singIn and signUp
                 .antMatchers("/api/v1/auth/**").permitAll()
                 .anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic();
+                .authenticated();
 
+                /**
+                  Basic auth used before JWT implementation
+                 .and()
+                .httpBasic();
+                 **/
+        http
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+    }
+
+    //Jwt auth filter method
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(){
+        return new JwtAuthenticationFilter();
     }
 
     //In memory Auth

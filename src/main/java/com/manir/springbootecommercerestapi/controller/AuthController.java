@@ -3,6 +3,8 @@ package com.manir.springbootecommercerestapi.controller;
 import com.manir.springbootecommercerestapi.dto.LoginDto;
 import com.manir.springbootecommercerestapi.dto.SignUpDto;
 import com.manir.springbootecommercerestapi.repository.UserRepository;
+import com.manir.springbootecommercerestapi.response.JWTAuthResponse;
+import com.manir.springbootecommercerestapi.security.JwtTokenProvider;
 import com.manir.springbootecommercerestapi.service.UserRegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,10 +30,12 @@ public class AuthController {
     private UserRepository userRepository;
     @Autowired
     private UserRegisterService userRegisterService;
+    @Autowired
+    private JwtTokenProvider tokenProvider;
 
     //login api
     @PostMapping("/login")
-    public ResponseEntity<String> authenticateUser(@RequestBody LoginDto loginDto){
+    public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDto loginDto){
 
         Authentication authentication = authenticationManager.authenticate(
                                     new UsernamePasswordAuthenticationToken(
@@ -40,7 +44,11 @@ public class AuthController {
                                     )
                                 );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>("User sign-In successfully", HttpStatus.OK);
+
+        //get token from token provider
+        String token = tokenProvider.generateToken(authentication);
+
+        return new ResponseEntity<>(new JWTAuthResponse(token), HttpStatus.OK);
     }
 
     //register api
