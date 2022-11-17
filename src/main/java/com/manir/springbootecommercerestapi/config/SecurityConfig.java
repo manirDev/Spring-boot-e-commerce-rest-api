@@ -48,7 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //to permit all get request and secure post put and delete methods
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                 //authorize singIn and signUp
-                .antMatchers("/api/v1/auth/**").permitAll()
+                .antMatchers("/api/v*/auth/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v*/contact/**").permitAll()
                 .anyRequest()
                 .authenticated();
 

@@ -52,4 +52,8 @@ public class User extends BaseEntity{
             fetch = FetchType.LAZY, orphanRemoval = true,
             mappedBy = "customer")
     private Set<Comment> comments;
+
+    //relation with profile
+    @OneToOne(mappedBy = "user")
+    private Profile user_profile;
  }

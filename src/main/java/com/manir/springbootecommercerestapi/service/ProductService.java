@@ -15,4 +15,6 @@ public interface ProductService {
     void deleteProduct(Long productId);
 
     ProductDto saveProductByCategoryId(Long categoryId, ProductDto productDto);
+
+    List<ProductDto> searchProduct(String query);
 }

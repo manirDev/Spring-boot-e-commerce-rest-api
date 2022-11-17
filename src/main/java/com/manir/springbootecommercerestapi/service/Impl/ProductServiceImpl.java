@@ -1,6 +1,7 @@
 package com.manir.springbootecommercerestapi.service.Impl;
 
 import com.manir.springbootecommercerestapi.dto.ProductDto;
+import com.manir.springbootecommercerestapi.exception.EcommerceApiException;
 import com.manir.springbootecommercerestapi.exception.ResourceNotFoundException;
 import com.manir.springbootecommercerestapi.repository.CategoryRepository;
 import com.manir.springbootecommercerestapi.repository.ProductRepository;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -129,6 +131,18 @@ public class ProductServiceImpl implements ProductService {
         ProductDto responseProduct = mapToDto(createdProduct);
 
         return responseProduct;
+    }
+
+    @Override
+    public List<ProductDto> searchProduct(String query) {
+        List<Product> products = productRepository.searchProduct(query);
+        if (products.size() == 0){
+            throw new EcommerceApiException("No product is found", HttpStatus.BAD_REQUEST);
+        }
+        List<ProductDto> productDtoList = products.stream()
+                                                          .map(product -> mapToDto(product))
+                                                          .collect(Collectors.toList());
+        return productDtoList;
     }
 
     //upload image

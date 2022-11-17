@@ -77,4 +77,10 @@ public class ProductController {
         return new ResponseEntity<>("Product with id: "+ productId +" is deleted successfully:)", HttpStatus.OK);
     }
 
+    //search product api
+    @GetMapping("/search")
+    public List<ProductDto> searchProduct(@RequestParam(value = "query") String query){
+        return productService.searchProduct(query);
+    }
+
 }
