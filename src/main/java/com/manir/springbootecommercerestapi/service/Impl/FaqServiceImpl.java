@@ -6,6 +6,7 @@ import com.manir.springbootecommercerestapi.model.Faq;
 import com.manir.springbootecommercerestapi.repository.FaqRepository;
 import com.manir.springbootecommercerestapi.service.CommonService;
 import com.manir.springbootecommercerestapi.service.FaqService;
+import com.manir.springbootecommercerestapi.service.MapperService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,15 @@ public class FaqServiceImpl implements FaqService {
     private final FaqRepository faqRepository;
     @Resource(name = "modelMapper")
     private final ModelMapper modelMapper;
-    @Resource(name = "commonService")
-    private final CommonService commonService;
+    @Resource(name = "mapperService")
+    private final MapperService<Faq, FaqDto> mapperService;
 
     @Override
     public FaqDto addFaq(FaqDto faqDto) {
-        Faq faq = mapToEntity(faqDto);
+        Faq faq = mapperService.mapToEntity(faqDto);
         Faq addedFaq = faqRepository.save(faq);
 
-        return mapToDto(addedFaq);
+        return mapperService.mapToDto(addedFaq);
     }
 
     @Override
