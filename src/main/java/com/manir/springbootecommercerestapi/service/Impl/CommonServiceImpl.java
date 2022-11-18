@@ -9,6 +9,7 @@ import com.manir.springbootecommercerestapi.response.CommonResponse;
 import com.manir.springbootecommercerestapi.service.CommonService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 
@@ -27,12 +29,15 @@ import java.util.List;
 @Service
 @Slf4j
 @AllArgsConstructor
+@Component("commonService")
 public class CommonServiceImpl implements CommonService{
 
     private static Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     @Resource(name = "userRepository")
     private final UserRepository userRepository;
+    @Resource(name = "modelMapper")
+    private final ModelMapper modelMapper;
 
     @Override
     public CommonResponse getResponseContent(Page page, List dtoList) {
@@ -74,5 +79,17 @@ public class CommonServiceImpl implements CommonService{
                                          );
 
         return currentUser;
+    }
+
+    @Override
+    public Object mapToEntity(Object type) {
+        Object entityObject = modelMapper.map(type, Object.class);
+        return entityObject;
+    }
+
+    @Override
+    public Object mapToDto(Object type) {
+        Object dtoObject = modelMapper.map(type, Object.class);
+        return dtoObject;
     }
 }

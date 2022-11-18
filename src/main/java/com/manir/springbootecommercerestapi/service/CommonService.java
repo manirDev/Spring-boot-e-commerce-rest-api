@@ -19,4 +19,10 @@ public interface CommonService<T> {
 
     //get current authenticated user
     User getCurrentAuthenticatedUser(Authentication authentication);
+
+    //entity mapper
+    T mapToEntity(T type);
+
+    //dto mapper
+    T mapToDto(T type);
 }
