@@ -1,36 +1,40 @@
 package com.manir.springbootecommercerestapi.service;
 
-import lombok.AllArgsConstructor;
+
+import lombok.Data;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
-@AllArgsConstructor
+
 @Service
 @Component("mapperService")
+@Data
 public class MapperServiceImpl<E, D> implements MapperService<E, D> {
 
 
     @Resource(name = "modelMapper")
     private final ModelMapper modelMapper;
-    @Resource
-    private final Class<E> entityClass;
-    @Resource
-    private final Class<D> dtoClass;
 
+    private Class<E> entityClass;
+
+    private Class<D> dtoClass;
+
+    public MapperServiceImpl(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
 
     @Override
     public E mapToEntity(D type) {
-        E model = modelMapper.map(type, entityClass);
+        E model = modelMapper.map(type, getEntityClass());
         return model;
     }
 
     @Override
     public D mapToDto(E type) {
-        D dto = modelMapper.map(type, dtoClass);
+        D dto = modelMapper.map(type, getDtoClass());
         return dto;
     }
 }

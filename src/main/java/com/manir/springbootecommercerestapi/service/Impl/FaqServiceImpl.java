@@ -36,7 +36,7 @@ public class FaqServiceImpl implements FaqService {
     @Override
     public List<FaqDto> listAllFaqs() {
         List<Faq> faqs = faqRepository.findAll();
-        return faqs.stream().map(faq -> mapToDto(faq)).collect(Collectors.toList());
+        return faqs.stream().map(faq -> mapperService.mapToDto(faq)).collect(Collectors.toList());
     }
 
     @Override
