@@ -46,6 +46,10 @@ public class Product extends BaseEntity{
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ImageData> images;
 
+    //relation image gallery
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<FileData> productImages;
+
     //relation to product comment
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments;
